@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Main application class for the Books API.
  * This is a Spring Boot application that provides REST endpoints for book searching.
+ *
  */
 @SpringBootApplication
 public class BooksApplication {
