@@ -74,32 +74,69 @@ Multi-keyword ANY search:
     curl -X POST -H "Content-Type: application/json" -d '{"keywords":["modern","press"],"matchMode":"ANY"}' \
       http://localhost:8080/api/books/search
 
-Multi-keyword ALL search:
+# Multi-keyword ALL
+curl -H "Content-Type: application/json" -d '{"keywords":["javascript","introduction"],"matchMode":"ALL"}' \
+  http://localhost:8080/api/books/search
+```
 
-    curl -X POST -H "Content-Type: application/json" -d '{"keywords":["java","spring"],"matchMode":"ALL"}' \
-      http://localhost:8080/api/books/search
+## Project Structure
+```
+src/
+  main/
+    java/com/example/cognizant/Books/
+      BooksApplication.java
+      controller/BooksController.java
+      service/BooksService.java
+      model/Book.java
+    resources/
+      application.properties
+      books.json (fallback)
+  test/
+    java/com/example/cognizant/Books/
+      BooksApplicationTests.java
+      controller/BooksControllerTest.java
+      service/BooksServiceTest.java
+postman_collection.json
+postman_environment.json
+README.md
+HELP.md
+```
 
-## Tests
-Run unit tests with the Maven wrapper:
+## Extending / Next Steps
+- Pagination & sorting (e.g., by published date or title).
+- ETag / conditional GET for client-side caching.
+- Scheduled refresh or cache TTL invalidation.
+- Add OpenAPI/Swagger via `springdoc-openapi` dependency.
+- Validation & error responses for malformed POST bodies.
+- Metrics & tracing integration (Micrometer / OpenTelemetry).
+- Containerization (Dockerfile + CI pipeline).
 
-    .\mvnw.cmd test
+## Using GitHub Actions (CI)
 
-## Project structure (high level)
+This project includes a GitHub Actions workflow that builds and tests the project automatically.
 
-- `src/main/java/com/example/cognizant/Books/`
-  - `BooksApplication.java` — Spring Boot entry point
-  - `controller/BooksController.java` — REST endpoints
-  - `controller/BooksWebController.java` — Thymeleaf web controller
-  - `service/BooksService.java` — loading/parsing/search logic
-  - `model/Book.java` — data model (Lombok)
-- `src/main/resources/` — `application.properties`, `books.json`, `templates/books.html`
-- `pom.xml` — Maven build (includes Thymeleaf dependency)
+How to run it:
 
-## Notes / Next steps
-- Consider adding pagination, sorting and OpenAPI docs (springdoc).
-- Add validation for POST bodies and better error responses.
-- Add CI badge after enabling build on GitHub Actions.
+1. Push a commit to the `main` branch or open a pull request — the workflow will run automatically.
+2. Or trigger it manually from the GitHub UI: go to the "Actions" tab, select the workflow named `CI`, then click "Run workflow".
+
+What the workflow does:
+
+- Checks out your repository
+- Sets up Java 21
+- Uses the Maven wrapper (`mvnw` / `mvnw.cmd`) to build and run tests
+- Caches Maven dependencies to speed up subsequent runs
+
+How to view results:
+
+1. On GitHub, open the "Actions" tab and choose the most recent run. Steps and logs are visible there.
+2. If a step fails, expand it to see the console output. The error message usually points to the failing test or build issue.
+
+Optional: GitHub Badge
+
+You can add a status badge to this README to show the build status. After the workflow runs, copy the badge from the workflow page and paste it at the top of this file.
+
+If you'd like, I can add the badge automatically once you confirm the workflow runs on GitHub. 
 
 ---
-
-If you want, I can also add examples for dockerizing the app or an OpenAPI spec file next.
+Feel free to adapt or extend. PRs / improvements welcome.
