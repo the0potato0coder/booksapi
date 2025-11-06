@@ -103,7 +103,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
+          script:
             # Log in to Docker Hub (needed to pull images)
             docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
             
@@ -130,4 +130,3 @@ jobs:
             # (Optional) Clean up old, dangling Docker images to save space
             docker image prune -f
 
-            
