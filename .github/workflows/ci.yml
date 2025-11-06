@@ -88,4 +88,44 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:latest
-  
+  deploy-to-ec2:
+    # This job runs only after 'build-and-push-docker' is successful
+    needs: build-and-push-docker
+    # It also only runs on a push to the main branch
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        # This action simplifies the SSH process
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Log in to Docker Hub (needed to pull images)
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+            
+            # Define container and image names for clarity
+            CONTAINER_NAME=${{ github.event.repository.name }}
+            IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:latest
+            
+            # Pull the new image
+            # docker pull $IMAGE_NAME
+            
+            # Stop the currently running container (if it exists)
+            # '|| true' ensures the workflow doesn't fail if the container isn't running
+            docker stop $CONTAINER_NAME || true
+            
+            # Remove the old container (if it exists)
+            docker rm $CONTAINER_NAME || true
+            
+            # Run the new container
+            # --- IMPORTANT! ---
+            # You MUST change '-p 8080:8080' to match your application's port.
+            # I used 8080 since it's common for Spring Boot projects.
+            docker run -d --name $CONTAINER_NAME -p 8080:8080 $IMAGE_NAME
+            
+            # (Optional) Clean up old, dangling Docker images to save space
+            docker image prune -f
