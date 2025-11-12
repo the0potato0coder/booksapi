@@ -121,6 +121,18 @@ jobs:
             
             # Remove the old container (if it exists)
             docker rm $CONTAINER_NAME || true
+
+            # Define the Java debug arguments
+            # address=*:5005 listens on all interfaces *inside* the container
+            DEBUG_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+
+            # Add -p 5005:5005 to map the port
+            # Add -e JAVA_OPTS="$DEBUG_OPTS" to pass the args to the app
+            docker run -d --name $CONTAINER_NAME \
+              -p 8080:8080 \
+              -p 5005:5005 \
+              -e JAVA_OPTS="$DEBUG_OPTS" \
+              $IMAGE_NAME
             
             # Run the new container (which was just pulled)
             # You MUST change '-p 8080:8080' to match your application's port.
